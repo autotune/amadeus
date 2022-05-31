@@ -6,9 +6,13 @@ import (
 	"time"
 
 	"github.com/fakovacic/amadeus"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load environment variables from .env file
+	godotenv.Load()
+
 	client, err := amadeus.New(
 		os.Getenv("AMADEUS_CLIENT_ID"),
 		os.Getenv("AMADEUS_CLIENT_SECRET"),
@@ -32,8 +36,11 @@ func main() {
 	// send request
 	err = client.Do(offerReq, &offerResp, "GET")
 
+	// fmt.Println(" ----- offerResp ------")
 	// get response
 	offerRespData := offerResp.(*amadeus.ShoppingFlightOffersResponse)
+	// fmt.Println(offerRespData.Data)
+	// fmt.Println(" ----- offerResp end ------")
 
 	// get pricing request&response
 	pricingReq, pricingResp, err := client.NewRequest(amadeus.ShoppingFlightPricing)
@@ -43,7 +50,7 @@ func main() {
 	// and offered as a random id
 	pricingReq.(*amadeus.ShoppingFlightPricingRequest).AddOffer(
 		// use id 250 to avoid "No fare applicable" error
-		offerRespData.GetOffer(250),
+		offerRespData.GetOffer(249), // index count begins with zero
 	)
 
 	err = client.Do(pricingReq, &pricingResp, "POST")
@@ -52,9 +59,12 @@ func main() {
 	pricingRequest, pricingResponse, err := client.NewRequest(amadeus.ShoppingFlightPricing)
 
 	// add offer from flight offers response
+	// fmt.Println(" ----- pricingRequest start ------")
 	pricingRequest.(*amadeus.ShoppingFlightPricingRequest).AddOffer(
-		offerRespData.GetOffer(0),
+		offerRespData.GetOffer(249),
 	)
+	// fmt.Println(pricingRequest)
+	// fmt.Println(" ----- pricingRequest end ------")
 
 	// send request
 	err = client.Do(pricingRequest, &pricingResponse, "POST")
@@ -88,10 +98,15 @@ func main() {
 			AddMobile("33", "480080072"),
 	)
 
+	// fmt.Println("--- send booking request start-----")
 	// send request
 	err = client.Do(bookingReq, &bookingResp, "POST")
+	// fmt.Println("--- send booking request end -----")
 
 	// get flight booking response
 	bookingRespData := bookingResp.(*amadeus.BookingFlightOrderResponse)
-	println(bookingRespData)
+	// fmt.Println("--- result -----")
+	fmt.Println(bookingRespData.Data)
+	// fmt.Println("--- result end -----")
+
 }
