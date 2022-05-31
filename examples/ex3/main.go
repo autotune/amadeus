@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"amadeus2"
+
+	"github.com/fakovacic/amadeus"
 )
 
 func main() {
@@ -34,63 +35,63 @@ func main() {
 	// get response
 	offerRespData := offerResp.(*amadeus.ShoppingFlightOffersResponse)
 
-        // get pricing request&response
-        pricingReq, pricingResp, err := client.NewRequest(amadeus.ShoppingFlightPricing)
+	// get pricing request&response
+	pricingReq, pricingResp, err := client.NewRequest(amadeus.ShoppingFlightPricing)
 
-        // add offer from flight offers response
-        // this should really be a parsed as json
-        // and offered as a random id 
-        pricingReq.(*amadeus.ShoppingFlightPricingRequest).AddOffer(
-             // use id 250 to avoid "No fare applicable" error
-             offerRespData.GetOffer(250),
-        )
+	// add offer from flight offers response
+	// this should really be a parsed as json
+	// and offered as a random id
+	pricingReq.(*amadeus.ShoppingFlightPricingRequest).AddOffer(
+		// use id 250 to avoid "No fare applicable" error
+		offerRespData.GetOffer(250),
+	)
 
-        err = client.Do(pricingReq, &pricingResp, "POST")
+	err = client.Do(pricingReq, &pricingResp, "POST")
 
-        // get pricing request&response
-        pricingRequest, pricingResponse, err := client.NewRequest(amadeus.ShoppingFlightPricing)
+	// get pricing request&response
+	pricingRequest, pricingResponse, err := client.NewRequest(amadeus.ShoppingFlightPricing)
 
-        // add offer from flight offers response
-        pricingRequest.(*amadeus.ShoppingFlightPricingRequest).AddOffer(
-             offerRespData.GetOffer(0),
-        )
+	// add offer from flight offers response
+	pricingRequest.(*amadeus.ShoppingFlightPricingRequest).AddOffer(
+		offerRespData.GetOffer(0),
+	)
 
-        // send request
-        err = client.Do(pricingRequest, &pricingResponse, "POST")
+	// send request
+	err = client.Do(pricingRequest, &pricingResponse, "POST")
 
-        // get response
-        pricingRespData := pricingResponse.(*amadeus.ShoppingFlightPricingResponse)
+	// get response
+	pricingRespData := pricingResponse.(*amadeus.ShoppingFlightPricingResponse)
 
-        // get booking request
-        bookingReq, bookingResp, err := client.NewRequest(amadeus.BookingFlightOrder)
+	// get booking request
+	bookingReq, bookingResp, err := client.NewRequest(amadeus.BookingFlightOrder)
 
-        // add offer from flight pricing response
-        bookingReq.(*amadeus.BookingFlightOrderRequest).AddOffers(
-            pricingRespData.GetOffers(),
-        ).AddTicketingAgreement("DELAY_TO_CANCEL", "6D")
+	// add offer from flight pricing response
+	bookingReq.(*amadeus.BookingFlightOrderRequest).AddOffers(
+		pricingRespData.GetOffers(),
+	).AddTicketingAgreement("DELAY_TO_CANCEL", "6D")
 
-        // println(pricingRespData.GetOffers())
+	// println(pricingRespData.GetOffers())
 
-        // add payment
-        bookingReq.(*amadeus.BookingFlightOrderRequest).AddPayment(
-           bookingReq.(*amadeus.BookingFlightOrderRequest).
-              NewCard("VI", "4111111111111111", "2023-01"),
-        )
+	// add payment
+	bookingReq.(*amadeus.BookingFlightOrderRequest).AddPayment(
+		bookingReq.(*amadeus.BookingFlightOrderRequest).
+			NewCard("VI", "4111111111111111", "2023-01"),
+	)
 
-        // add traveler
-        bookingReq.(*amadeus.BookingFlightOrderRequest).AddTraveler(
-            bookingReq.(*amadeus.BookingFlightOrderRequest).
-                NewTraveler(
-                    "Foo", "Bar", "MALE", "1990-02-15",
-                ).
-                AddEmail("foo@bar.com").
-                AddMobile("33", "480080072"),
-        )
+	// add traveler
+	bookingReq.(*amadeus.BookingFlightOrderRequest).AddTraveler(
+		bookingReq.(*amadeus.BookingFlightOrderRequest).
+			NewTraveler(
+				"Foo", "Bar", "MALE", "1990-02-15",
+			).
+			AddEmail("foo@bar.com").
+			AddMobile("33", "480080072"),
+	)
 
-        // send request
-        err = client.Do(bookingReq, &bookingResp, "POST")
+	// send request
+	err = client.Do(bookingReq, &bookingResp, "POST")
 
-        // get flight booking response
-        bookingRespData := bookingResp.(*amadeus.BookingFlightOrderResponse)
-        println(bookingRespData)
+	// get flight booking response
+	bookingRespData := bookingResp.(*amadeus.BookingFlightOrderResponse)
+	println(bookingRespData)
 }

@@ -1,12 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"time"
-        "encoding/json"
-	"amadeus2"
+
+	"github.com/fakovacic/amadeus"
 )
+
+type Iot struct {
+	Id      int             `json:"id"`
+	Name    string          `json:"name"`
+	Context json.RawMessage `json:"context"`
+}
 
 func main() {
 	client, err := amadeus.New(
@@ -34,6 +41,6 @@ func main() {
 
 	// get response
 	offerRespData := offerResp.(*amadeus.ShoppingFlightOffersResponse)
-        println(offerRespData)
+	println(offerRespData)
 
 }
