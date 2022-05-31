@@ -45,12 +45,15 @@ func main() {
 	// get pricing request&response
 	pricingReq, pricingResp, err := client.NewRequest(amadeus.ShoppingFlightPricing)
 
+	// set an offer Id to use for offer request and pricing
+	offerIdUsed := 249
+
 	// add offer from flight offers response
 	// this should really be a parsed as json
 	// and offered as a random id
 	pricingReq.(*amadeus.ShoppingFlightPricingRequest).AddOffer(
 		// use id 250 to avoid "No fare applicable" error
-		offerRespData.GetOffer(249), // index count begins with zero
+		offerRespData.GetOffer(offerIdUsed), // index count begins with zero
 	)
 
 	err = client.Do(pricingReq, &pricingResp, "POST")
@@ -61,7 +64,7 @@ func main() {
 	// add offer from flight offers response
 	// fmt.Println(" ----- pricingRequest start ------")
 	pricingRequest.(*amadeus.ShoppingFlightPricingRequest).AddOffer(
-		offerRespData.GetOffer(249),
+		offerRespData.GetOffer(offerIdUsed),
 	)
 	// fmt.Println(pricingRequest)
 	// fmt.Println(" ----- pricingRequest end ------")
